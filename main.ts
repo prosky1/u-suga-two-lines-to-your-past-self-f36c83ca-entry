@@ -1,17 +1,19 @@
-// Two Lines to Your Past Self — make.fun entry
+// Two Lines to Your Past Self — make.fun entry (TOP 1 V2b)
 // Writes the two-line warning to /output/entry.txt.
 //
-// Line 1 warns the past self about one specific moment, in a single
-// sentence. Line 2 says in one sentence why that moment mattered and
-// what changed because of it. The entry text is fixed verbatim below.
+// Line 1 warns the past self about one specific moment — skipping the
+// backup before a small migration — in a single sentence. Line 2 says
+// in one sentence why that moment mattered: the skipped backup cost a
+// year of photos of the writer's daughter, and changed how they work.
+// The entry text is fixed verbatim below.
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const LINE_ONE =
-  "Do not say 'fixed it' before you run the tests, because the demo is in ten minutes and the bug is still there.";
+  "Do not skip the backup because the migration is small and you have done it a hundred times.";
 
 const LINE_TWO =
-  "That one sentence cost me the client's trust, and ever since I let the green checkmark speak first.";
+  "That skipped backup ate my daughter's first year of photos, and now I back up before I touch anything.";
 
 const OUTPUT_PATH = "/output/entry.txt";
 
@@ -21,6 +23,24 @@ function fail(message: string): never {
 }
 
 const entry = `${LINE_ONE}\n${LINE_TWO}`;
+
+// Guard: exactly one newline separator — no trailing newline, no extra
+// blank line. The scorer counts every character, so a stray newline at
+// the end would still pass the gate but change the submitted text.
+const newlineCount = (entry.match(/\n/g) ?? []).length;
+if (newlineCount !== 1 || entry.endsWith("\n")) {
+  fail(`entry must contain exactly one newline separator, got ${newlineCount}`);
+}
+
+// Guard: byte length must equal character length here (pure ASCII text),
+// so the Size column on the leaderboard matches the counted characters.
+const byteCount = Buffer.byteLength(entry, "utf8");
+if (byteCount !== charCountOf(entry)) {
+  fail(`byte length ${byteCount} differs from character count`);
+}
+function charCountOf(text: string): number {
+  return [...text].length;
+}
 
 // Gate: the sealed scorer accepts UTF-8 text of 1 to 280 characters.
 const charCount = [...entry].length;
